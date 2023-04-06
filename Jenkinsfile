@@ -24,7 +24,7 @@ pipeline {
         }
         stage('Test') {
             steps {
-                echo '=== Testing Prepple ML Application ==='
+                echo '== Testing Prepple ML Application =='
                 sh 'python3 -m pytest --junit-xml=./reports/test_report.xml'
             }
         }
