@@ -1,23 +1,25 @@
 pipeline {
     agent any
        triggers {
-        pollSCM "* * * * *"
+        pollSCM "H * * * *"
        }
     stages {
         stage('Set Up Virtual Environment') {
             steps {
+                sh 'which python3'
                 echo 'Ensuring pip is up to date'
                 sh 'python3 -m pip install --upgrade pip'
-                echo 'Creating a virtual evironment'
-                sh 'python3 -m venv .'
-                echo 'Activating the virtual environment'
-                sh '. bin/activate'
+                sh 'python3 -m venv ~/.venv'
+                sh 'source ~/.venv/bin/activate'
             }
         }
         stage('Build') { 
             steps {
-                echo '=== Installing dependencies ==='
-                sh 'python3 -m pip install -r requirements.txt'
+                echo "=== Installing dependencies ==="
+                sh "ls ~"
+                sh "ls"
+                sh "ls ${env.WORKSPACE}"
+                sh "python3 -m pip install -r ${env.WORKSPACE}/requirements.txt"
             }
         }
         stage('Test') {
@@ -61,16 +63,4 @@ pipeline {
             }
         }
     }
-
-    post {
-      // always is for code that you want to run
-      // after EVERY pipeline run
-      always {
-         // publish our test reports with junit
-         junit 'reports/*.xml'
-         // Clean the workspace.
-         // This deletes everything in the workspace
-         cleanWs()
-      }
-   }
 }
