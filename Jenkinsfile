@@ -1,9 +1,12 @@
 pipeline {
     agent any
-       triggers {
-        pollSCM "H * * * *"
-       }
     stages {
+        stage('Checkout') {
+            steps {
+                cleanWs()
+                git branch: 'master', credentialsId: 'f902d431-5ed8-4710-a982-658caf62f8d0', url: 'https://github.com/jayeclark/prepple-ml.git'
+            }
+        }
         stage('Set Up Virtual Environment') {
             steps {
                 sh 'which python3'
@@ -30,7 +33,7 @@ pipeline {
         }
         stage('Build Docker Image') {
             when {
-                branch 'master'
+                branch 'main'
             }
             steps {
                 echo '=== Building Prepple ML Docker Image ==='
@@ -41,7 +44,7 @@ pipeline {
         }
         stage('Push Docker Image') {
             when {
-                branch 'master'
+                branch 'main'
             }
             steps {
                 echo '=== Pushing Prepple ML Docker Image ==='
@@ -56,6 +59,9 @@ pipeline {
             }
         }
         stage('Remove local images') {
+            when {
+                branch 'main'
+            }
             steps {
                 echo '=== Delete the local docker images ==='
                 sh("docker rmi -f jayeclark/prepple-ml-admin:latest || :")
